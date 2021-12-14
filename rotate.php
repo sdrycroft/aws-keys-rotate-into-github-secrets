@@ -5,29 +5,29 @@ require 'vendor/autoload.php';
 use App\Github;
 use Aws\Iam\IamClient;
 use GetOpt\GetOpt;
-use GetOpt\Option;
 use Symfony\Component\Yaml\Yaml;
 
-$options = new GetOpt(
-    [
-        Option::create('c', 'config-file', GetOpt::REQUIRED_ARGUMENT)
-            ->setDefaultValue('rotate.yml')
-            ->setDescription('Relative or absolute path to YAML file that has the settings for rotate'),
-    ]
-);
+// Process command arguments.
 try {
-    $options->process();
+    $config = new GetOpt([
+        ['c', 'config', GetOpt::REQUIRED_ARGUMENT, 'Relative or absolute path to YAML file that has the settings for rotate', 'rotate.yml'],
+        ['v', 'verbose', GetOpt::NO_ARGUMENT],
+    ]);
+    $config->process();
+    $configFile = $config->getOption('config');
+    $verbose = $config->getOption('verbose');
 } catch (Exception $exception) {
-    echo $options->getHelpText();
+    echo "An error occurred processing your arguments".PHP_EOL;
     exit(1);
 }
 
-$configFile = $options->getOption('config-file');
-
-if ($options->getOption('help') || !$configFile) {
-    echo $options->getHelpText();
+// Output help if that was asked for.
+if ($config->getOption('help') || !$configFile) {
+    echo $config->getHelpText();
     exit;
 }
+
+// Change the path to be an absolute one if we were given a relative one.
 if (substr($configFile, 0, 1) !== '/') {
     $configFile = "{$_ENV['PWD']}/$configFile";
 }
@@ -71,15 +71,20 @@ if (!file_exists($configFile)) {
 
     echo Yaml::dump($config, 10);
 
-    echo "\n\nCreate a configuration like the one above.\n";
+    echo PHP_EOL.PHP_EOL."Create a configuration like the one above.".PHP_EOL;
     exit(0);
 }
 
+// Check we can write to the configuration file.
+if (!is_writeable($configFile)) {
+    echo "Configuration file is not writable.".PHP_EOL;
+    exit(1);
+}
 $config = Yaml::parseFile($configFile);
 
 // Check that the contents of the configuration have been updated.
 if ($config['USER'] === 'user' || $config['KEY'] === 'key' || $config['secret'] === 'secret') {
-    echo "Please update your configuration before running again.\n";
+    echo "Please update your configuration before running again.".PHP_EOL;
     exit(1);
 };
 
@@ -91,9 +96,9 @@ foreach ($config['keys'] as $keyName => $keyData) {
 
     $keys = $iamClient->listAccessKeys(['user' => $keyData['aws']['user']])->get('AccessKeyMetadata');
 
-    // We should have one key, if we don't, something has gone wrong and we need to recover.
+    // We should have one key, if we don't, something has gone wrong, and we need to recover.
     if (count($keys) !== 1) {
-        echo "Incorrect number of access keys, bailing.\n";
+        echo "Incorrect number of access keys, bailing.".PHP_EOL;
         exit(1);
     }
     $oldKey = $keys[0];
@@ -101,31 +106,54 @@ foreach ($config['keys'] as $keyName => $keyData) {
     // 0. Check that the key is older than our specified time interval.
     $now = new DateTime();
     if ($now->sub(new DateInterval($keyData['aws']['maxKeyAge'] ?: "P7D")) > $oldKey['CreateDate']) {
+        if ($verbose) {
+            echo "Updating key '{$keyName}'".PHP_EOL;
+        }
         // 1. Create a new key.
         $newKey = $iamClient->createAccessKey(['user' => $keyData['aws']['user']]);
         $newKey = $newKey->get('AccessKey');
+        if ($verbose) {
+            echo "Created new AWS Key for '{$keyData['aws']['user']}'".PHP_EOL;
+        }
 
         // 2. Update the configuration and write it out.
         $config['keys'][$keyName]['aws']['config']['credentials']['key'] = $newKey['AccessKeyId'];
         $config['keys'][$keyName]['aws']['config']['credentials']['secret'] = $newKey['SecretAccessKey'];
         file_put_contents($configFile, Yaml::dump($config, 10));
+        if ($verbose) {
+            echo "Updated configuration file".PHP_EOL;
+        }
 
         // 3. Set Github Secrets.
         foreach ($keyData['keyDestinations'] as $keyDestination) {
-            $github->setSecret(
-                $keyDestination['owner'],
-                $keyDestination['repo'],
-                $keyDestination['key'],
-                $newKey['AccessKeyId']
-            );
+            try {
+                $github->setSecret(
+                    $keyDestination['owner'],
+                    $keyDestination['repo'],
+                    $keyDestination['key'],
+                    $newKey['AccessKeyId']
+                );
+                if ($verbose) {
+                    echo "Set {$keyDestination['owner']}/{$keyDestination['repo']} :: {$keyDestination['key']}".PHP_EOL;
+                }
+            } catch (Exception $exception) {
+                echo "Unable to set {$keyDestination['owner']}/{$keyDestination['repo']} :: {$keyDestination['key']}".PHP_EOL;
+            }
         }
         foreach ($keyData['secretDestinations'] as $secretDestination) {
-            $github->setSecret(
-                $secretDestination['owner'],
-                $secretDestination['repo'],
-                $secretDestination['key'],
-                $newKey['SecretAccessKey']
-            );
+            try {
+                $github->setSecret(
+                    $secretDestination['owner'],
+                    $secretDestination['repo'],
+                    $secretDestination['key'],
+                    $newKey['SecretAccessKey']
+                );
+                if ($verbose) {
+                    echo "Set {$secretDestination['owner']}/{$secretDestination['repo']} :: {$secretDestination['key']}".PHP_EOL;
+                }
+            } catch (Exception $exception) {
+                echo "Unable to set {$secretDestination['owner']}/{$secretDestination['repo']} :: {$secretDestination['key']}".PHP_EOL;
+            }
         }
 
         // 4. Delete old key.
@@ -135,5 +163,12 @@ foreach ($config['keys'] as $keyName => $keyData) {
                 'UserName' => $keyData['aws']['user'],
             ]
         );
+        if ($verbose) {
+            echo "Deleted AWS Key for '{$keyData['aws']['user']}'".PHP_EOL;
+        }
+    } else {
+        if ($verbose) {
+            echo "Key '{$keyName}' is already newer than required".PHP_EOL;
+        }
     }
 }
