@@ -20,4 +20,3 @@ $phar->setStub($stub);
 $phar->stopBuffering();
 $phar->compressFiles(Phar::GZ);
 chmod($pharFile, 0755);
-rename($pharFile, str_replace('.phar', '', $pharFile));
