@@ -12,10 +12,12 @@ try {
     $config = new GetOpt([
         ['c', 'config', GetOpt::REQUIRED_ARGUMENT, 'Relative or absolute path to YAML file that has the settings for rotate', 'rotate.yml'],
         ['v', 'verbose', GetOpt::NO_ARGUMENT],
+        ['f', 'force', GetOpt::NO_ARGUMENT, 'Ignore the age of the existing key, and update'],
     ]);
     $config->process();
     $configFile = $config->getOption('config');
     $verbose = $config->getOption('verbose');
+    $force = $config->getOption('force');
 } catch (Exception $exception) {
     echo "An error occurred processing your arguments".PHP_EOL;
     exit(1);
@@ -105,7 +107,7 @@ foreach ($config['keys'] as $keyName => $keyData) {
 
     // 0. Check that the key is older than our specified time interval.
     $now = new DateTime();
-    if ($now->sub(new DateInterval($keyData['aws']['maxKeyAge'] ?: "P7D")) > $oldKey['CreateDate']) {
+    if ($force || $now->sub(new DateInterval($keyData['aws']['maxKeyAge'] ?: "P7D")) > $oldKey['CreateDate']) {
         if ($verbose) {
             echo "Updating key '{$keyName}'".PHP_EOL;
         }
