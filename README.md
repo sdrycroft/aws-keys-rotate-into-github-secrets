@@ -35,16 +35,20 @@ keys:
     keyDestinations:
       - owner: sdrycroft
         repo: aws-keys-rotate-into-github-secrets
+        secretType: actions # Not required, as this is the default
         key: AWS_KEY
       - owner: sdrycroft
         repo: another-repo
+        secretType: dependabot
         key: AWS_KEY
     secretDestinations:
       - owner: sdrycroft
         repo: aws-keys-rotate-into-github-secrets
+        secretType: actions
         key: AWS_SECRET
       - owner: sdrycroft
         repo: another-repo
+        secretType: dependabot
         key: AWS_SECRET
   identifier2:
     aws:
@@ -59,15 +63,19 @@ keys:
     keyDestinations:
       - owner: sdrycroft
         repo: aws-keys-rotate-into-github-secrets
+        secretType: actions
         key: BARRY_AWS_KEY
       - owner: sdrycroft
         repo: another-repo
+        secretType: actions
         key: BARRY_AWS_KEY
     secretDestinations:
       - owner: sdrycroft
         repo: aws-keys-rotate-into-github-secrets
+        secretType: actions
         key: BARRY_AWS_SECRET
       - owner: sdrycroft
         repo: another-repo
+        secretType: actions
         key: BARRY_AWS_SECRET
 ```
