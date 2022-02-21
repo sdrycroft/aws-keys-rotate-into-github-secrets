@@ -57,6 +57,7 @@ if (!file_exists($configFile)) {
                     [
                         'owner' => 'owner',
                         'repo' => 'repo',
+                        'secretType' => 'actions',
                         'key' => 'AWS_ACCESS_KEY_ID',
                     ],
                 ],
@@ -64,6 +65,7 @@ if (!file_exists($configFile)) {
                     [
                         'owner' => 'owner',
                         'repo' => 'repo',
+                        'secretType' => 'actions',
                         'key' => 'AWS_SECRET_ACCESS_KEY',
                     ],
                 ],
@@ -128,33 +130,41 @@ foreach ($config['keys'] as $keyName => $keyData) {
 
         // 3. Set Github Secrets.
         foreach ($keyData['keyDestinations'] as $keyDestination) {
+            if (!array_key_exists('secretType', $keyDestination)) {
+                $keyDestination['secretType'] = 'actions';
+            }
             try {
                 $github->setSecret(
                     $keyDestination['owner'],
                     $keyDestination['repo'],
+                    $keyDestination['secretType'],
                     $keyDestination['key'],
                     $newKey['AccessKeyId']
                 );
                 if ($verbose) {
-                    echo "Set {$keyDestination['owner']}/{$keyDestination['repo']} :: {$keyDestination['key']}".PHP_EOL;
+                    echo "Set {$keyDestination['owner']}/{$keyDestination['repo']} :: {$keyDestination['secretType']}/{$keyDestination['key']}".PHP_EOL;
                 }
-            } catch (Exception $exception) {
-                echo "Unable to set {$keyDestination['owner']}/{$keyDestination['repo']} :: {$keyDestination['key']}".PHP_EOL;
+            } catch (Throwable $exception) {
+                echo "Unable to set {$keyDestination['owner']}/{$keyDestination['repo']} :: {$keyDestination['secretType']}/{$keyDestination['key']}".PHP_EOL;
             }
         }
         foreach ($keyData['secretDestinations'] as $secretDestination) {
+            if (!array_key_exists('secretType', $secretDestination)) {
+                $secretDestination['secretType'] = 'actions';
+            }
             try {
                 $github->setSecret(
                     $secretDestination['owner'],
                     $secretDestination['repo'],
+                    $secretDestination['secretType'],
                     $secretDestination['key'],
                     $newKey['SecretAccessKey']
                 );
                 if ($verbose) {
-                    echo "Set {$secretDestination['owner']}/{$secretDestination['repo']} :: {$secretDestination['key']}".PHP_EOL;
+                    echo "Set {$secretDestination['owner']}/{$secretDestination['repo']} :: {$secretDestination['secretType']}/{$secretDestination['key']}".PHP_EOL;
                 }
-            } catch (Exception $exception) {
-                echo "Unable to set {$secretDestination['owner']}/{$secretDestination['repo']} :: {$secretDestination['key']}".PHP_EOL;
+            } catch (Throwable $exception) {
+                echo "Unable to set {$secretDestination['owner']}/{$secretDestination['repo']} :: {$secretDestination['secretType']}/{$secretDestination['key']}".PHP_EOL;
             }
         }
 
