@@ -86,12 +86,6 @@ if (!is_writeable($configFile)) {
 }
 $config = Yaml::parseFile($configFile);
 
-// Check that the contents of the configuration have been updated.
-if ($config['USER'] === 'user' || $config['KEY'] === 'key' || $config['secret'] === 'secret') {
-    echo "Please update your configuration before running again.".PHP_EOL;
-    exit(1);
-};
-
 // Github client
 $github = new Github($config['github']['token']);
 
