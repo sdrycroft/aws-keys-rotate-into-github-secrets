@@ -584,16 +584,16 @@
         },
         {
             "name": "paragonie/sodium_compat",
-            "version": "v1.17.1",
+            "version": "v1.18.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/paragonie/sodium_compat.git",
-                "reference": "ac994053faac18d386328c91c7900f930acadf1e"
+                "reference": "f3cf7d1f3214889639da40db1f6c6d4afb4c85f7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/paragonie/sodium_compat/zipball/ac994053faac18d386328c91c7900f930acadf1e",
-                "reference": "ac994053faac18d386328c91c7900f930acadf1e",
+                "url": "https://api.github.com/repos/paragonie/sodium_compat/zipball/f3cf7d1f3214889639da40db1f6c6d4afb4c85f7",
+                "reference": "f3cf7d1f3214889639da40db1f6c6d4afb4c85f7",
                 "shasum": ""
             },
             "require": {
@@ -664,9 +664,9 @@
             ],
             "support": {
                 "issues": "https://github.com/paragonie/sodium_compat/issues",
-                "source": "https://github.com/paragonie/sodium_compat/tree/v1.17.1"
+                "source": "https://github.com/paragonie/sodium_compat/tree/v1.18.1"
             },
-            "time": "2022-03-23T19:32:04+00:00"
+            "time": "2022-09-23T14:34:43+00:00"
         },
         {
             "name": "psr/http-client",
