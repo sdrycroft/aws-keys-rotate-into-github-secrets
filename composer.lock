@@ -1191,26 +1191,26 @@
         },
         {
             "name": "ulrichsg/getopt-php",
-            "version": "v4.0.2",
+            "version": "v4.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/getopt-php/getopt-php.git",
-                "reference": "821d6118c3701a8ec83110e3c0726c92120959f8"
+                "reference": "91c31c9bc0ff9bbe22b0b02c63c7f5ddb8d2a8d5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/getopt-php/getopt-php/zipball/821d6118c3701a8ec83110e3c0726c92120959f8",
-                "reference": "821d6118c3701a8ec83110e3c0726c92120959f8",
+                "url": "https://api.github.com/repos/getopt-php/getopt-php/zipball/91c31c9bc0ff9bbe22b0b02c63c7f5ddb8d2a8d5",
+                "reference": "91c31c9bc0ff9bbe22b0b02c63c7f5ddb8d2a8d5",
                 "shasum": ""
             },
             "require": {
                 "ext-mbstring": "*",
-                "php": ">=7.1 || ^8.0"
+                "php": "^7.1 || ^8.0"
             },
             "require-dev": {
-                "limedeck/phpunit-detailed-printer": "*",
                 "phpunit/phpunit": "*",
-                "squizlabs/php_codesniffer": "^3.5.8"
+                "squizlabs/php_codesniffer": "^3.5.8",
+                "tflori/phpunit-printer": "*"
             },
             "type": "library",
             "autoload": {
@@ -1236,9 +1236,9 @@
             "homepage": "http://getopt-php.github.io/getopt-php",
             "support": {
                 "issues": "https://github.com/getopt-php/getopt-php/issues",
-                "source": "https://github.com/getopt-php/getopt-php/tree/v4.0.2"
+                "source": "https://github.com/getopt-php/getopt-php/tree/v4.0.3"
             },
-            "time": "2022-03-11T17:04:44+00:00"
+            "time": "2022-12-13T20:37:45+00:00"
         }
     ],
     "packages-dev": [],
