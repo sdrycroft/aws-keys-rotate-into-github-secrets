@@ -22,7 +22,7 @@
         "ext-json": "*",
         "aws/aws-sdk-php": "^3.184",
         "ulrichsg/getopt-php": "^4.0",
-        "symfony/yaml": "^5.3",
+        "symfony/yaml": "^7.1",
         "guzzlehttp/guzzle": "^7.3",
         "paragonie/sodium_compat": "^2.0"
     },
