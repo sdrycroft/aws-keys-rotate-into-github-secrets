@@ -23,7 +23,7 @@
         "aws/aws-sdk-php": "^3.184",
         "ulrichsg/getopt-php": "^4.0",
         "symfony/yaml": "^8.1",
-        "guzzlehttp/guzzle": "^7.3",
+        "guzzlehttp/guzzle": "^8.3",
         "paragonie/sodium_compat": "^2.0"
     },
     "autoload": {
